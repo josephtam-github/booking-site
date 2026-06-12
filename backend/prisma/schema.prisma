@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SlotStatus {
+  FREE
+  BOOKED
+  UNAVAILABLE
+}
+
+model Booking {
+  id        Int        @id @default(autoincrement())
+  name      String?
+  email     String?
+  phone     String?
+  date      DateTime
+  startTime String
+  endTime   String
+  status    SlotStatus @default(FREE)
+  createdAt DateTime   @default(now())
+
+  @@unique([date, startTime, endTime])
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}

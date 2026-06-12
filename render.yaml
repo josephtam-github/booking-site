@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: booking-site-backend
+    env: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run prisma:generate
+    startCommand: npm run start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: booking-site-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@example.com
+      - key: ADMIN_PASSWORD
+        value: Admin123!
+
+  - type: static_site
+    name: booking-site-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://booking-site-backend.onrender.com/api
+
+databases:
+  - name: booking-site-db
+    plan: free

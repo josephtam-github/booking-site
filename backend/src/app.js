@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SlotStatus } = require('@prisma/client');
@@ -12,6 +13,13 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+const adminRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 120,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+});
 
 const dateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
@@ -88,7 +96,7 @@ app.post('/api/bookings', async (req, res) => {
   }
 
   if (slot.status !== SlotStatus.FREE) {
-    return res.status(409).json({ error: 'Slot is not available' });
+    return res.status(409).json({ error: 'Slot is already booked or unavailable' });
   }
 
   const booking = await prisma.booking.update({
@@ -127,7 +135,7 @@ app.get('/api/bookings/:id', async (req, res) => {
   });
 });
 
-app.post('/api/admin/login', async (req, res) => {
+app.post('/api/admin/login', adminRateLimit, async (req, res) => {
   const schema = z.object({
     email: z.string().email(),
     password: z.string().min(6),
@@ -157,7 +165,7 @@ app.post('/api/admin/login', async (req, res) => {
   return res.json({ token });
 });
 
-app.get('/api/admin/bookings', requireAdminAuth, async (req, res) => {
+app.get('/api/admin/bookings', adminRateLimit, requireAdminAuth, async (req, res) => {
   const { startDate, endDate, status } = req.query;
   const where = {};
 
@@ -203,7 +211,7 @@ app.get('/api/admin/bookings', requireAdminAuth, async (req, res) => {
   });
 });
 
-app.patch('/api/admin/slots/:id', requireAdminAuth, async (req, res) => {
+app.patch('/api/admin/slots/:id', adminRateLimit, requireAdminAuth, async (req, res) => {
   const id = Number(req.params.id);
   const schema = z.object({
     status: z.enum(['free', 'unavailable']),
@@ -233,7 +241,7 @@ app.patch('/api/admin/slots/:id', requireAdminAuth, async (req, res) => {
   return res.json(toApiBooking(slot));
 });
 
-app.delete('/api/admin/bookings/:id', requireAdminAuth, async (req, res) => {
+app.delete('/api/admin/bookings/:id', adminRateLimit, requireAdminAuth, async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({ error: 'Invalid booking ID' });

@@ -18,6 +18,7 @@ function BookingPage() {
   const [bookedSlot, setBookedSlot] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
   const [viewMode, setViewMode] = useState('timeGridDay');
+  const [slotDuration, setSlotDuration] = useState('00:30:00');
   const [range, setRange] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const calendarRef = useRef(null);
@@ -94,9 +95,36 @@ function BookingPage() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-slate-900">Booking Calendar</h1>
         <div className="flex gap-2">
-          <button className="rounded bg-slate-900 px-3 py-1 text-sm text-white" onClick={() => setViewMode('timeGridDay')} type="button">Day</button>
-          <button className="rounded bg-slate-700 px-3 py-1 text-sm text-white" onClick={() => setViewMode('timeGridWeek')} type="button">Week</button>
-          <button className="rounded bg-blue-700 px-3 py-1 text-sm text-white" onClick={() => setViewMode('timeGridDay')} type="button">Hour Grid</button>
+          <button
+            className="rounded bg-slate-900 px-3 py-1 text-sm text-white"
+            onClick={() => {
+              setViewMode('timeGridDay');
+              setSlotDuration('00:30:00');
+            }}
+            type="button"
+          >
+            Day
+          </button>
+          <button
+            className="rounded bg-slate-700 px-3 py-1 text-sm text-white"
+            onClick={() => {
+              setViewMode('timeGridWeek');
+              setSlotDuration('00:30:00');
+            }}
+            type="button"
+          >
+            Week
+          </button>
+          <button
+            className="rounded bg-blue-700 px-3 py-1 text-sm text-white"
+            onClick={() => {
+              setViewMode('timeGridDay');
+              setSlotDuration('01:00:00');
+            }}
+            type="button"
+          >
+            Hour Grid
+          </button>
         </div>
       </div>
 
@@ -111,6 +139,7 @@ function BookingPage() {
             setRange({ start: arg.start, end: arg.end });
           }}
           allDaySlot={false}
+          slotDuration={slotDuration}
           slotLabelFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
           events={events}
           eventContent={(eventInfo) => {

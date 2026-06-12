@@ -101,7 +101,8 @@ Frontend runs at `http://localhost:5173`.
    - `booking-site-backend` (Node web service)
    - `booking-site-frontend` (static site)
 4. Update the frontend `VITE_API_BASE_URL` in Render if backend URL differs.
-5. Run Prisma migration on backend after first deploy:
+5. Set `ADMIN_PASSWORD` as a secret environment variable in Render.
+6. Run Prisma migration on backend after first deploy:
 
 ```bash
 cd backend

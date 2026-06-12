@@ -16,7 +16,7 @@ services:
       - key: ADMIN_EMAIL
         value: admin@example.com
       - key: ADMIN_PASSWORD
-        value: Admin123!
+        sync: false
 
   - type: static_site
     name: booking-site-frontend

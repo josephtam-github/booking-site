@@ -136,7 +136,18 @@ function BookingPage() {
           plugins={[timeGridPlugin, interactionPlugin]}
           initialView="timeGridDay"
           datesSet={(arg) => {
-            setRange({ start: arg.start, end: arg.end });
+            setRange((prev) => {
+              // If the dates are exactly the same as the previous state, 
+              // return the old object so React doesn't trigger a re-render.
+              if (
+                prev &&
+                prev.start.getTime() === arg.start.getTime() &&
+                prev.end.getTime() === arg.end.getTime()
+              ) {
+                return prev;
+              }
+              return { start: arg.start, end: arg.end };
+            });
           }}
           allDaySlot={false}
           slotDuration={slotDuration}
